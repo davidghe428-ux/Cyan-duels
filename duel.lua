@@ -1,4 +1,4 @@
--- Cyan Duels - Exact Visual Match Layout
+-- Cyan Duels - Interactive Components UI
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local TweenService = game:GetService("TweenService")
@@ -13,7 +13,6 @@ ScreenGui.Name = "CyanDuelsHub"
 ScreenGui.Parent = CoreGui
 ScreenGui.ResetOnSpawn = false
 
--- Color Scheme Matching the Image
 local STYLE = {
     MainBg = Color3.fromRGB(11, 14, 24),
     InnerBg = Color3.fromRGB(7, 9, 16),
@@ -24,14 +23,14 @@ local STYLE = {
     TextDim = Color3.fromRGB(90, 95, 115)
 }
 
--- --- MAIN PANEL ---
+-- Main Window Frame
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 440, 0, 280)
-MainFrame.Position = UDim2.new(0.5, -220, 0.5, -140)
+MainFrame.Size = UDim2.new(0, 440, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -220, 0.5, -160)
 MainFrame.BackgroundColor3 = STYLE.MainBg
 MainFrame.BorderSizePixel = 0
-MainFrame.Parent = MainFrame
+MainFrame.Parent = ScreenGui
 
 local MainCorner = Instance.new("UICorner")
 MainCorner.CornerRadius = UDim.new(0, 8)
@@ -42,57 +41,10 @@ MainStroke.Color = STYLE.AccentCyan
 MainStroke.Thickness = 1.5
 MainStroke.Parent = MainFrame
 
--- Top Left Status and Title
-local StatusDot = Instance.new("Frame")
-StatusDot.Size = UDim2.new(0, 6, 0, 6)
-StatusDot.Position = UDim2.new(0, 14, 0, 16)
-StatusDot.BackgroundColor3 = STYLE.AccentCyan
-StatusDot.BorderSizePixel = 0
-StatusDot.Parent = MainFrame
-
-local StatusDotCorner = Instance.new("UICorner")
-StatusDotCorner.CornerRadius = UDim.new(1, 0)
-StatusDotCorner.Parent = StatusDot
-
-local TitleLabel = Instance.new("TextLabel")
-TitleLabel.Size = UDim2.new(0, 120, 0, 35)
-TitleLabel.Position = UDim2.new(0, 26, 0, 2)
-TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "CYAN DUELS"
-TitleLabel.TextColor3 = STYLE.AccentCyan
-TitleLabel.TextSize = 14
-TitleLabel.Font = Enum.Font.GothamBold
-TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-TitleLabel.Parent = MainFrame
-
--- --- SIDEBAR NAVIGATION ---
-local Sidebar = Instance.new("Frame")
-Sidebar.Size = UDim2.new(0, 100, 1, -50)
-Sidebar.Position = UDim2.new(0, 10, 0, 45)
-Sidebar.BackgroundTransparency = 1
-Sidebar.Parent = MainFrame
-
-local SidebarLayout = Instance.new("UIListLayout")
-SidebarLayout.Parent = Sidebar
-SidebarLayout.Padding = UDim.new(0, 2)
-
-local Tabs = {"Speed", "Steal", "Movement", "Visual"}
-for i, tabName in ipairs(Tabs) do
-    local TabBtn = Instance.new("TextButton")
-    TabBtn.Size = UDim2.new(1, 0, 0, 28)
-    TabBtn.BackgroundTransparency = 1
-    TabBtn.Text = tabName:upper()
-    TabBtn.TextColor3 = (i == 1) and STYLE.AccentCyan or STYLE.TextDim
-    TabBtn.TextSize = 11
-    TabBtn.Font = Enum.Font.GothamMedium
-    TabBtn.TextXAlignment = Enum.TextXAlignment.Left
-    TabBtn.Parent = Sidebar
-end
-
--- --- INNER VALUE CONTENT CONTAINER ---
+-- Panel Content Window
 local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, -135, 0, 160)
-ContentFrame.Position = UDim2.new(0, 120, 0, 45)
+ContentFrame.Size = UDim2.new(1, -30, 1, -50)
+ContentFrame.Position = UDim2.new(0, 15, 0, 40)
 ContentFrame.BackgroundColor3 = STYLE.InnerBg
 ContentFrame.BorderSizePixel = 0
 ContentFrame.Parent = MainFrame
@@ -101,130 +53,138 @@ local ContentCorner = Instance.new("UICorner")
 ContentCorner.CornerRadius = UDim.new(0, 6)
 ContentCorner.Parent = ContentFrame
 
--- Header Category Label
-local SectionHeader = Instance.new("TextLabel")
-SectionHeader.Size = UDim2.new(1, -20, 0, 25)
-SectionHeader.Position = UDim2.new(0, 12, 0, 8)
-SectionHeader.BackgroundTransparency = 1
-SectionHeader.Text = "SPEED VALUES"
-SectionHeader.TextColor3 = STYLE.TextHeader
-SectionHeader.TextSize = 10
-SectionHeader.Font = Enum.Font.GothamBold
-SectionHeader.TextXAlignment = Enum.TextXAlignment.Left
-SectionHeader.Parent = ContentFrame
+local ListLayout = Instance.new("UIListLayout")
+ListLayout.Parent = ContentFrame
+ListLayout.Padding = UDim.new(0, 10)
+ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
--- Helper function to generate rows (Normal Speed / Lagger Speed)
-local function CreateValueRow(labelName, descText, carryVal, normalVal, yPos)
-    local RowFrame = Instance.new("Frame")
-    RowFrame.Size = UDim2.new(1, -24, 0, 50)
-    RowFrame.Position = UDim2.new(0, 12, 0, yPos)
-    RowFrame.BackgroundTransparency = 1
-    RowFrame.Parent = ContentFrame
+local Padding = Instance.new("UIPadding")
+Padding.PaddingTop = UDim.new(0, 15)
+Padding.Parent = ContentFrame
 
-    local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(0, 120, 0, 18)
-    Title.BackgroundTransparency = 1
-    Title.Text = labelName
-    Title.TextColor3 = STYLE.TextMain
-    Title.TextSize = 12
-    Title.Font = Enum.Font.GothamBold
-    Title.TextXAlignment = Enum.TextXAlignment.Left
-    Title.Parent = RowFrame
+-- --- CUSTOM INTERACTIVE FRONTEND OBJECTS ---
 
-    local Desc = Instance.new("TextLabel")
-    Desc.Size = UDim2.new(0, 120, 0, 14)
-    Desc.Position = UDim2.new(0, 0, 0, 16)
-    Desc.BackgroundTransparency = 1
-    Desc.Text = descText
-    Desc.TextColor3 = STYLE.TextDim
-    Desc.TextSize = 9
-    Desc.Font = Enum.Font.GothamMedium
-    Desc.TextXAlignment = Enum.TextXAlignment.Left
-    Desc.Parent = RowFrame
+-- 1. Input Box Builder
+local function CreateTextBox(labelText, defaultPlaceholder)
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -30, 0, 40)
+    Container.BackgroundTransparency = 1
+    Container.Parent = ContentFrame
 
-    -- Labels for Carry / Normal column headers
-    local CarryLbl = Instance.new("TextLabel")
-    CarryLbl.Size = UDim2.new(0, 45, 0, 12)
-    CarryLbl.Position = UDim2.new(1, -100, 0, 2)
-    CarryLbl.BackgroundTransparency = 1
-    CarryLbl.Text = "CARRY"
-    CarryLbl.TextColor3 = STYLE.TextDim
-    CarryLbl.TextSize = 8
-    CarryLbl.Font = Enum.Font.GothamBold
-    CarryLbl.Parent = RowFrame
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0, 150, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.TextColor3 = STYLE.TextMain
+    Label.TextSize = 12
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Container
 
-    local NormalLbl = Instance.new("TextLabel")
-    NormalLbl.Size = UDim2.new(0, 45, 0, 12)
-    NormalLbl.Position = UDim2.new(1, -45, 0, 2)
-    NormalLbl.BackgroundTransparency = 1
-    NormalLbl.Text = "NORMAL"
-    NormalLbl.TextColor3 = STYLE.TextDim
-    NormalLbl.TextSize = 8
-    NormalLbl.Font = Enum.Font.GothamBold
-    NormalLbl.Parent = RowFrame
+    local InputBox = Instance.new("TextBox")
+    InputBox.Size = UDim2.new(0, 120, 0, 26)
+    InputBox.Position = UDim2.new(1, -120, 0.5, -13)
+    InputBox.BackgroundColor3 = STYLE.CardBg
+    InputBox.Text = ""
+    InputBox.PlaceholderText = defaultPlaceholder
+    InputBox.TextColor3 = STYLE.TextMain
+    InputBox.PlaceholderColor3 = STYLE.TextDim
+    InputBox.TextSize = 11
+    InputBox.Font = Enum.Font.GothamMedium
+    InputBox.Parent = Container
 
-    -- Display boxes for values
-    local CarryBox = Instance.new("TextLabel")
-    CarryBox.Size = UDim2.new(0, 45, 0, 24)
-    CarryBox.Position = UDim2.new(1, -100, 0, 16)
-    CarryBox.BackgroundColor3 = STYLE.CardBg
-    CarryBox.Text = carryVal
-    CarryBox.TextColor3 = STYLE.TextMain
-    CarryBox.TextSize = 11
-    CarryBox.Font = Enum.Font.GothamBold
-    CarryBox.Parent = RowFrame
-    Instance.new("UICorner", CarryBox).CornerRadius = UDim.new(0, 4)
+    local BoxCorner = Instance.new("UICorner")
+    BoxCorner.CornerRadius = UDim.new(0, 4)
+    BoxCorner.Parent = InputBox
 
-    local NormalBox = Instance.new("TextLabel")
-    NormalBox.Size = UDim2.new(0, 45, 0, 24)
-    NormalBox.Position = UDim2.new(1, -45, 0, 16)
-    NormalBox.BackgroundColor3 = STYLE.CardBg
-    NormalBox.Text = normalVal
-    NormalBox.TextColor3 = STYLE.TextMain
-    NormalBox.TextSize = 11
-    NormalBox.Font = Enum.Font.GothamBold
-    NormalBox.Parent = RowFrame
-    Instance.new("UICorner", NormalBox).CornerRadius = UDim.new(0, 4)
+    local BoxStroke = Instance.new("UIStroke")
+    BoxStroke.Color = Color3.fromRGB(35, 40, 55)
+    BoxStroke.Thickness = 1
+    BoxStroke.Parent = InputBox
+
+    InputBox.FocusLost:Connect(function(enterPressed)
+        print("Input updated to: " .. InputBox.Text)
+    end)
 end
 
-CreateValueRow("Normal Speed", "Standard movement", "30", "60", 35)
-CreateValueRow("Lagger Speed", "Low-ping lagger", "13", "13", 95)
+-- 2. Dropdown Menu Builder
+local function CreateDropdown(labelText, itemsList)
+    local Container = Instance.new("Frame")
+    Container.Size = UDim2.new(1, -30, 0, 40)
+    Container.BackgroundTransparency = 1
+    Container.Parent = ContentFrame
 
--- --- BOTTOM PROGRESS BAR PANEL ---
-local BottomPanel = Instance.new("Frame")
-BottomPanel.Size = UDim2.new(1, -135, 0, 50)
-BottomPanel.Position = UDim2.new(0, 120, 0, 215)
-BottomPanel.BackgroundColor3 = STYLE.InnerBg
-BottomPanel.BorderSizePixel = 0
-BottomPanel.Parent = MainFrame
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(0, 150, 1, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = labelText
+    Label.TextColor3 = STYLE.TextMain
+    Label.TextSize = 12
+    Label.Font = Enum.Font.GothamMedium
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Container
 
-local BottomCorner = Instance.new("UICorner")
-BottomCorner.CornerRadius = UDim.new(0, 6)
-BottomCorner.Parent = BottomPanel
+    local DropBtn = Instance.new("TextButton")
+    DropBtn.Size = UDim2.new(0, 120, 0, 26)
+    DropBtn.Position = UDim2.new(1, -120, 0.5, -13)
+    DropBtn.BackgroundColor3 = STYLE.CardBg
+    DropBtn.Text = itemsList[1] or "Select..."
+    DropBtn.TextColor3 = STYLE.TextMain
+    DropBtn.TextSize = 11
+    DropBtn.Font = Enum.Font.GothamMedium
+    DropBtn.Parent = Container
 
-local ProgressPercent = Instance.new("TextLabel")
-ProgressPercent.Size = UDim2.new(0, 50, 1, 0)
-ProgressPercent.Position = UDim2.new(0, 12, 0, 0)
-ProgressPercent.BackgroundTransparency = 1
-ProgressPercent.Text = "0%"
-ProgressPercent.TextColor3 = STYLE.AccentCyan
-ProgressPercent.TextSize = 14
-ProgressPercent.Font = Enum.Font.GothamBold
-ProgressPercent.TextXAlignment = Enum.TextXAlignment.Left
-ProgressPercent.Parent = BottomPanel
+    Instance.new("UICorner", DropBtn).CornerRadius = UDim.new(0, 4)
 
-local RadiusDisplay = Instance.new("TextLabel")
-RadiusDisplay.Size = UDim2.new(0, 100, 1, 0)
-RadiusDisplay.Position = UDim2.new(1, -120, 0, 0)
-RadiusDisplay.BackgroundTransparency = 1
-RadiusDisplay.Text = "Radius: 20"
-RadiusDisplay.TextColor3 = STYLE.TextMain
-RadiusDisplay.TextSize = 11
-RadiusDisplay.Font = Enum.Font.GothamMedium
-RadiusDisplay.TextXAlignment = Enum.TextXAlignment.Right
-RadiusDisplay.Parent = BottomPanel
+    -- Dropdown Open List Panel
+    local DropList = Instance.new("Frame")
+    DropList.Size = UDim2.new(0, 120, 0, 0)
+    DropList.Position = UDim2.new(1, -120, 0.5, 15)
+    DropList.BackgroundColor3 = STYLE.MainBg
+    DropList.BorderSizePixel = 0
+    DropList.Visible = false
+    DropList.ZIndex = 5
+    DropList.Parent = Container
 
--- --- DRAG SETUP ---
+    local ListCorner = Instance.new("UICorner")
+    ListCorner.CornerRadius = UDim.new(0, 4)
+    ListCorner.Parent = DropList
+
+    local DropLayout = Instance.new("UIListLayout")
+    DropLayout.Parent = DropList
+
+    local isOpen = false
+    DropBtn.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        DropList.Visible = isOpen
+        DropList.Size = isOpen and UDim2.new(0, 120, 0, #itemsList * 24) or UDim2.new(0, 120, 0, 0)
+    end)
+
+    for _, itemName in ipairs(itemsList) do
+        local ItemBtn = Instance.new("TextButton")
+        ItemBtn.Size = UDim2.new(1, 0, 0, 24)
+        ItemBtn.BackgroundTransparency = 1
+        ItemBtn.Text = itemName
+        ItemBtn.TextColor3 = STYLE.TextMain
+        ItemBtn.TextSize = 10
+        ItemBtn.Font = Enum.Font.GothamMedium
+        ItemBtn.ZIndex = 6
+        ItemBtn.Parent = DropList
+
+        ItemBtn.MouseButton1Click:Connect(function()
+            DropBtn.Text = itemName
+            isOpen = false
+            DropList.Visible = false
+            print("Selected configuration mode: " .. itemName)
+        end)
+    end
+end
+
+-- Generate the design controls
+CreateTextBox("Target Range Value", "e.g. 50")
+CreateDropdown("Preset Layout Theme", {"Cyan Neon", "Deep Midnight", "Sleek Stealth"})
+
+-- Simple dragging script
 local dragging, dragInput, dragStart, startPos
 local function update(input)
     local delta = input.Position - dragStart
@@ -233,9 +193,7 @@ end
 
 MainFrame.InputBegan:Connect(function(input)
     if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true
-        dragStart = input.Position
-        startPos = MainFrame.Position
+        dragging = true; dragStart = input.Position; startPos = MainFrame.Position
         input.Changed:Connect(function()
             if input.UserInputState == Enum.UserInputState.End then dragging = false end
         end)
