@@ -79,13 +79,9 @@ local function loadConfigState()
                 if cfg.lockGui ~= nil then _guiLocked=cfg.lockGui==true; if setLockGuiVisual then setLockGuiVisual(_guiLocked) end end
                 if cfg.introEnabled ~= nil then _introEnabled=cfg.introEnabled==true; if setIntroVisual then setIntroVisual(_introEnabled) end end
                 
-                -- Cyan Duels Theme Injection
+                -- Force Cyan Duels Theme Injection & Color Sync
                 if setAccent_global then 
-                        if cfg.themeAccent and type(cfg.themeAccent)=="table" and #cfg.themeAccent==3 then
-                                setAccent_global(Color3.new(cfg.themeAccent[1], cfg.themeAccent[2], cfg.themeAccent[3])) 
-                        else
-                                setAccent_global(Color3.fromRGB(0, 255, 255)) -- Fallback to Neon Cyan
-                        end
+                        setAccent_global(Color3.fromRGB(0, 255, 255)) -- Enforce high-vis Neon Cyan theme override
                 end
                 
                 if cfg.sidebarArt and type(cfg.sidebarArt)=="string" then
@@ -100,4 +96,4 @@ end
 loadConfigKeys()
 buildGui()
 loadConfigState()
-print("Cyan Duels Loaded")
+print("Cyan Duels Loaded Successfully")
