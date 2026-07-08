@@ -1,211 +1,103 @@
--- Cyan Duels - Interactive Components UI
-local Players = game:GetService("Players")
-local CoreGui = game:GetService("CoreGui")
-local TweenService = game:GetService("TweenService")
-local UserInputService = game:GetService("UserInputService")
-
-if CoreGui:FindFirstChild("CyanDuelsHub") then
-    CoreGui.CyanDuelsHub:Destroy()
+-- =========================================================
+                        -- PHASE 5 (3.3 - 4.0s): Everything fades, panel materializes
+                        -- =========================================================
+                        TS:Create(center, TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+                        TS:Create(title, TweenInfo.new(0.4), {TextTransparency = 1, TextStrokeTransparency = 1}):Play()
+                        TS:Create(subtitle, TweenInfo.new(0.35), {TextTransparency = 1}):Play()
+                        TS:Create(lineTop, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 2)}):Play()
+                        TS:Create(lineBot, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Size = UDim2.new(0, 0, 0, 2)}):Play()
+                        TS:Create(darkBg, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+                        TS:Create(moonContainer, TweenInfo.new(0.6, Enum.EasingStyle.Quad), {Position = UDim2.new(0.78, 0, 1.2, 0)}):Play()
+                        TS:Create(moon, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+                        TS:Create(moonHalo, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+                        TS:Create(moonGlow, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play()
+                        for _, c in ipairs(craters) do TS:Create(c, TweenInfo.new(0.5), {BackgroundTransparency = 1}):Play() end
+                        for _, sd in ipairs(stars) do TS:Create(sd.frame, TweenInfo.new(0.6), {BackgroundTransparency = 1}):Play() end
+                        TS:Create(main, TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = origSize}):Play()
+                        task.wait(0.7)
+                        introActive = false
+                        pcall(function() driftConn:Disconnect() end)
+                        pcall(function() introGui:Destroy() end)
+                end)
+        end
 end
-
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CyanDuelsHub"
-ScreenGui.Parent = CoreGui
-ScreenGui.ResetOnSpawn = false
-
-local STYLE = {
-    MainBg = Color3.fromRGB(11, 14, 24),
-    InnerBg = Color3.fromRGB(7, 9, 16),
-    CardBg = Color3.fromRGB(15, 18, 32),
-    AccentCyan = Color3.fromRGB(0, 160, 255),
-    TextMain = Color3.fromRGB(230, 235, 255),
-    TextHeader = Color3.fromRGB(0, 130, 255),
-    TextDim = Color3.fromRGB(90, 95, 115)
-}
-
--- Main Window Frame
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 440, 0, 320)
-MainFrame.Position = UDim2.new(0.5, -220, 0.5, -160)
-MainFrame.BackgroundColor3 = STYLE.MainBg
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-
-local MainCorner = Instance.new("UICorner")
-MainCorner.CornerRadius = UDim.new(0, 8)
-MainCorner.Parent = MainFrame
-
-local MainStroke = Instance.new("UIStroke")
-MainStroke.Color = STYLE.AccentCyan
-MainStroke.Thickness = 1.5
-MainStroke.Parent = MainFrame
-
--- Panel Content Window
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, -30, 1, -50)
-ContentFrame.Position = UDim2.new(0, 15, 0, 40)
-ContentFrame.BackgroundColor3 = STYLE.InnerBg
-ContentFrame.BorderSizePixel = 0
-ContentFrame.Parent = MainFrame
-
-local ContentCorner = Instance.new("UICorner")
-ContentCorner.CornerRadius = UDim.new(0, 6)
-ContentCorner.Parent = ContentFrame
-
-local ListLayout = Instance.new("UIListLayout")
-ListLayout.Parent = ContentFrame
-ListLayout.Padding = UDim.new(0, 10)
-ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-
-local Padding = Instance.new("UIPadding")
-Padding.PaddingTop = UDim.new(0, 15)
-Padding.Parent = ContentFrame
-
--- --- CUSTOM INTERACTIVE FRONTEND OBJECTS ---
-
--- 1. Input Box Builder
-local function CreateTextBox(labelText, defaultPlaceholder)
-    local Container = Instance.new("Frame")
-    Container.Size = UDim2.new(1, -30, 0, 40)
-    Container.BackgroundTransparency = 1
-    Container.Parent = ContentFrame
-
-    local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(0, 150, 1, 0)
-    Label.BackgroundTransparency = 1
-    Label.Text = labelText
-    Label.TextColor3 = STYLE.TextMain
-    Label.TextSize = 12
-    Label.Font = Enum.Font.GothamMedium
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.Parent = Container
-
-    local InputBox = Instance.new("TextBox")
-    InputBox.Size = UDim2.new(0, 120, 0, 26)
-    InputBox.Position = UDim2.new(1, -120, 0.5, -13)
-    InputBox.BackgroundColor3 = STYLE.CardBg
-    InputBox.Text = ""
-    InputBox.PlaceholderText = defaultPlaceholder
-    InputBox.TextColor3 = STYLE.TextMain
-    InputBox.PlaceholderColor3 = STYLE.TextDim
-    InputBox.TextSize = 11
-    InputBox.Font = Enum.Font.GothamMedium
-    InputBox.Parent = Container
-
-    local BoxCorner = Instance.new("UICorner")
-    BoxCorner.CornerRadius = UDim.new(0, 4)
-    BoxCorner.Parent = InputBox
-
-    local BoxStroke = Instance.new("UIStroke")
-    BoxStroke.Color = Color3.fromRGB(35, 40, 55)
-    BoxStroke.Thickness = 1
-    BoxStroke.Parent = InputBox
-
-    InputBox.FocusLost:Connect(function(enterPressed)
-        print("Input updated to: " .. InputBox.Text)
-    end)
+local _savedCfg = nil
+local function loadConfigKeys()
+        if not(isfile and isfile("Tooze.json")) then return end
+        local ok,cfg=pcall(function() return HS:JSONDecode(readfile("Tooze.json")) end)
+        if not ok or not cfg then return end
+        _savedCfg=cfg
+        local function lk(e,d) if type(d)~="table" then return end;if d.kb and Enum.KeyCode[d.kb] then e.kb=Enum.KeyCode[d.kb] end;if d.gp and Enum.KeyCode[d.gp] then e.gp=Enum.KeyCode[d.gp] end end
+        lk(KB.DropBrainrot,cfg.dropBrainrotKey);lk(KB.AutoLeft,cfg.autoLeftKey);lk(KB.AutoRight,cfg.autoRightKey)
+        lk(KB.AutoBat,cfg.autoBatKey);lk(KB.LaggerToggle,cfg.laggerToggleKey)
+        lk(KB.TPFloor,cfg.tpFloorKey);lk(KB.InstaReset,cfg.instaResetKey);lk(KB.GuiHide,cfg.guiHideKey);lk(KB.SpeedToggle,cfg.speedToggleKey)
+        if cfg.normalSpeed then NS=cfg.normalSpeed end
+        if cfg.carrySpeed then CS=cfg.carrySpeed end
+        if cfg.grabRadius and type(cfg.grabRadius)=="number" then Steal.StealRadius=cfg.grabRadius else Steal.StealRadius=60 end
+        if cfg.stealDuration and type(cfg.stealDuration)=="number" then Steal.StealDuration=cfg.stealDuration else Steal.StealDuration=1.4 end
+        if cfg.laggerSpeed and type(cfg.laggerSpeed)=="number" then LAGGER_SPEED=cfg.laggerSpeed end
+        if cfg.laggerCarrySpeed and type(cfg.laggerCarrySpeed)=="number" then LAGGER_CARRY_SPEED=cfg.laggerCarrySpeed end
+        if cfg.autoTPHeight and type(cfg.autoTPHeight)=="number" then autoTPHeight=cfg.autoTPHeight end
+        if cfg.autoSwing~=nil then autoSwingEnabled=cfg.autoSwing==true end
+        if cfg.customFovValue and type(cfg.customFovValue)=="number" then V.customFovValue=cfg.customFovValue end
 end
-
--- 2. Dropdown Menu Builder
-local function CreateDropdown(labelText, itemsList)
-    local Container = Instance.new("Frame")
-    Container.Size = UDim2.new(1, -30, 0, 40)
-    Container.BackgroundTransparency = 1
-    Container.Parent = ContentFrame
-
-    local Label = Instance.new("TextLabel")
-    Label.Size = UDim2.new(0, 150, 1, 0)
-    Label.BackgroundTransparency = 1
-    Label.Text = labelText
-    Label.TextColor3 = STYLE.TextMain
-    Label.TextSize = 12
-    Label.Font = Enum.Font.GothamMedium
-    Label.TextXAlignment = Enum.TextXAlignment.Left
-    Label.Parent = Container
-
-    local DropBtn = Instance.new("TextButton")
-    DropBtn.Size = UDim2.new(0, 120, 0, 26)
-    DropBtn.Position = UDim2.new(1, -120, 0.5, -13)
-    DropBtn.BackgroundColor3 = STYLE.CardBg
-    DropBtn.Text = itemsList[1] or "Select..."
-    DropBtn.TextColor3 = STYLE.TextMain
-    DropBtn.TextSize = 11
-    DropBtn.Font = Enum.Font.GothamMedium
-    DropBtn.Parent = Container
-
-    Instance.new("UICorner", DropBtn).CornerRadius = UDim.new(0, 4)
-
-    -- Dropdown Open List Panel
-    local DropList = Instance.new("Frame")
-    DropList.Size = UDim2.new(0, 120, 0, 0)
-    DropList.Position = UDim2.new(1, -120, 0.5, 15)
-    DropList.BackgroundColor3 = STYLE.MainBg
-    DropList.BorderSizePixel = 0
-    DropList.Visible = false
-    DropList.ZIndex = 5
-    DropList.Parent = Container
-
-    local ListCorner = Instance.new("UICorner")
-    ListCorner.CornerRadius = UDim.new(0, 4)
-    ListCorner.Parent = DropList
-
-    local DropLayout = Instance.new("UIListLayout")
-    DropLayout.Parent = DropList
-
-    local isOpen = false
-    DropBtn.MouseButton1Click:Connect(function()
-        isOpen = not isOpen
-        DropList.Visible = isOpen
-        DropList.Size = isOpen and UDim2.new(0, 120, 0, #itemsList * 24) or UDim2.new(0, 120, 0, 0)
-    end)
-
-    for _, itemName in ipairs(itemsList) do
-        local ItemBtn = Instance.new("TextButton")
-        ItemBtn.Size = UDim2.new(1, 0, 0, 24)
-        ItemBtn.BackgroundTransparency = 1
-        ItemBtn.Text = itemName
-        ItemBtn.TextColor3 = STYLE.TextMain
-        ItemBtn.TextSize = 10
-        ItemBtn.Font = Enum.Font.GothamMedium
-        ItemBtn.ZIndex = 6
-        ItemBtn.Parent = DropList
-
-        ItemBtn.MouseButton1Click:Connect(function()
-            DropBtn.Text = itemName
-            isOpen = false
-            DropList.Visible = false
-            print("Selected configuration mode: " .. itemName)
+local function loadConfigState()
+        local cfg=_savedCfg;if not cfg then return end
+        if normalBox then normalBox.Text=tostring(NS) end
+        if carryBox then carryBox.Text=tostring(CS) end
+        if radInput then radInput.Text=tostring(Steal.StealRadius) end
+        if durInput then durInput.Text=tostring(Steal.StealDuration) end
+        if progressRadLbl then progressRadLbl.Text=string.format("Radius: %.2g",Steal.StealRadius) end
+        if laggerBox then laggerBox.Text=tostring(LAGGER_SPEED) end
+        if laggerCarryBox then laggerCarryBox.Text=tostring(LAGGER_CARRY_SPEED) end
+        if autoTPHeightBox then autoTPHeightBox.Text=tostring(autoTPHeight) end
+        if V.customFovBox then V.customFovBox.Text=tostring(V.customFovValue) end
+        task.spawn(function()
+                task.wait(0.15)
+                if cfg.antiRagdoll then antiRagdollEnabled=true;if setAntiRagVisual then setAntiRagVisual(true) end;startAntiRagdoll() end
+                if cfg.autoStealEnabled then Steal.AutoStealEnabled=true;if setInstaGrab then setInstaGrab(true) end;pcall(startAutoSteal) end
+                if cfg.infiniteJump then infJumpEnabled=true;if setInfJumpVisual then setInfJumpVisual(true) end end
+                if cfg.medusaCounter then medusaCounterEnabled=true;if setMedusaVisual then setMedusaVisual(true) end;setupMedusa(LP.Character) end
+                if cfg.batCounter then batCounterEnabled=true;if setBatCounterVisual then setBatCounterVisual(true) end;startBatCounter() end
+                if cfg.laggerMode then laggerToggled=true;speedMode=false;laggerPhase=cfg.laggerCarryMode and 2 or 1;refreshSpeedModeLabel()
+                elseif cfg.carryMode then speedMode=false;toggleCarryMode() end
+                if cfg.autoTPEnabled then autoTPEnabled=true;if setAutoTPVisual then setAutoTPVisual(true) end;startAutoTP() end
+                if setAutoSwingVisual then setAutoSwingVisual(autoSwingEnabled) end
+                if cfg.batSpeed and cfg.batSpeed > 0 and cfg.batSpeed <= 200 then AUTO_BAT_SPEED=cfg.batSpeed end
+                if cfg.batVertSpeed and cfg.batVertSpeed > 0 and cfg.batVertSpeed <= 200 then AUTO_BAT_VERT_SPEED=cfg.batVertSpeed end
+                if cfg.autoBat then autoBatEnabled=true;if autoBatSetVisual then autoBatSetVisual(true) end;queueAutoBatStart() end
+                if cfg.unwalkEnabled then unwalkEnabled=true;if setUnwalkVisual then setUnwalkVisual(true) end;task.spawn(function() task.wait(0.5);startUnwalk() end) end
+                if cfg.antiLag then enableAntiLag();if setAntiLagVisual then setAntiLagVisual(true) end end
+                if cfg.stretchRez then enableStretchRez();if setStretchRezVisual then setStretchRezVisual(true) end end
+                if cfg.customFov then enableCustomFov();if V.setCustomFovVisual then V.setCustomFovVisual(true) end end
+                if cfg.skyTheme and SKY_PRESETS[cfg.skyTheme] then applyCustomSky(cfg.skyTheme);if V.setSkyVisual then V.setSkyVisual() end end
+                if cfg.ultraMode then enableUltraMode();if V.setUltraModeVisual then V.setUltraModeVisual(true) end end
+                if cfg.removeAccessories then enableRemoveAccessories();if V.setRemoveAccVisual then V.setRemoveAccVisual(true) end end
+                if cfg.customFontEnabled then task.spawn(function() task.wait(1);enableCustomFont() end);if V.setCustomFontVisual then V.setCustomFontVisual(true) end end
+                if cfg.potatoGraphics then enablePotatoGraphics();if V.setPotatoVisual then V.setPotatoVisual(true) end end
+                if cfg.autoSave ~= nil then V.autoSaveEnabled=cfg.autoSave end  
+                if cfg.lockGui ~= nil then _guiLocked=cfg.lockGui==true; if setLockGuiVisual then setLockGuiVisual(_guiLocked) end end
+                if cfg.introEnabled ~= nil then _introEnabled=cfg.introEnabled==true; if setIntroVisual then setIntroVisual(_introEnabled) end end
+                
+                -- Cyan Duels Theme Injection
+                if setAccent_global then 
+                        if cfg.themeAccent and type(cfg.themeAccent)=="table" and #cfg.themeAccent==3 then
+                                setAccent_global(Color3.new(cfg.themeAccent[1], cfg.themeAccent[2], cfg.themeAccent[3])) 
+                        else
+                                setAccent_global(Color3.fromRGB(0, 255, 255)) -- Fallback to Neon Cyan
+                        end
+                end
+                
+                if cfg.sidebarArt and type(cfg.sidebarArt)=="string" then
+                        if cfg.sidebarArt == "111817612356516" or cfg.sidebarArt == "115117078011241" or cfg.sidebarArt == "82028776918457" then cfg.sidebarArt = "99283614914059" end
+                        pcall(function() if setSidebarArt_global then setSidebarArt_global(cfg.sidebarArt) end end)
+                end
+                if cfg.playerESP then
+                        pcall(function() startPlayerESP(); if setPlayerESPVisual then setPlayerESPVisual(true) end end)
+                end
         end)
-    end
 end
-
--- Generate the design controls
-CreateTextBox("Target Range Value", "e.g. 50")
-CreateDropdown("Preset Layout Theme", {"Cyan Neon", "Deep Midnight", "Sleek Stealth"})
-
--- Simple dragging script
-local dragging, dragInput, dragStart, startPos
-local function update(input)
-    local delta = input.Position - dragStart
-    MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
-end
-
-MainFrame.InputBegan:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-        dragging = true; dragStart = input.Position; startPos = MainFrame.Position
-        input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then dragging = false end
-        end)
-    end
-end)
-
-MainFrame.InputChanged:Connect(function(input)
-    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-        dragInput = input
-    end
-end)
-
-UserInputService.InputChanged:Connect(function(input)
-    if input == dragInput and dragging then update(input) end
-end)
+loadConfigKeys()
+buildGui()
+loadConfigState()
+print("Cyan Duels Loaded")
